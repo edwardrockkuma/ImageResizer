@@ -48,6 +48,7 @@ namespace ImageResizer
         {
             var allFiles = FindImages(sourcePath);
             ConcurrentBag<Task> resizeTasksBag = new ConcurrentBag<Task>();
+            LogThreadId("Start to work [asynchronously]...");
 
             foreach (var filePath in allFiles)          
             {
@@ -76,6 +77,7 @@ namespace ImageResizer
             }
 
             await Task.WhenAll( resizeTasksBag );
+            LogThreadId("End to work [asynchronously]...");
         }
 
         /// <summary>
@@ -115,7 +117,7 @@ namespace ImageResizer
                 new Rectangle(0, 0, srcWidth, srcHeight),
                 GraphicsUnit.Pixel);
 
-            //LogThreadId("End - ProcessBitmap");
+            LogThreadId("End of processing bitmaps");
             return resizedbitmap;
         }
 
