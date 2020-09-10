@@ -9,21 +9,43 @@ namespace ImageResizer
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             string sourcePath = Path.Combine(Environment.CurrentDirectory, "images");
             string destinationPath = Path.Combine(Environment.CurrentDirectory, "output"); ;
 
             ImageProcess imageProcess = new ImageProcess();
-
-            imageProcess.Clean(destinationPath);
+            ImageProcessAdvance imageProcessAdvance = new ImageProcessAdvance();          
 
             Stopwatch sw = new Stopwatch();
+
+            #region Original Code
+
+            imageProcess.Clean(destinationPath);
             sw.Start();
             imageProcess.ResizeImages(sourcePath, destinationPath, 2.0);
             sw.Stop();
+            var syncTime = sw.ElapsedMilliseconds;
 
-            Console.WriteLine($"花費時間: {sw.ElapsedMilliseconds} ms");
+            #endregion
+
+            #region Async Version
+
+            imageProcessAdvance.Clean(destinationPath);
+            sw.Reset();
+            sw.Start();
+            // 
+            var asyncTask = imageProcessAdvance.ResizeImagesAsync(sourcePath, destinationPath, 2.0);
+            await asyncTask;
+
+            sw.Stop();
+            var asyncTime = sw.ElapsedMilliseconds;
+            double performanceRatio = ((double)(syncTime - asyncTime)/(double)syncTime) * 100;
+            #endregion
+
+            Console.WriteLine($" [Sync] - 花費時間: {syncTime} ms");
+            Console.WriteLine($" [Async] - 花費時間: {asyncTime} ms");
+            Console.WriteLine($" 提升效率: { performanceRatio.ToString("N2") } %");
         }
     }
 }
